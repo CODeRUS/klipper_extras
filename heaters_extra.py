@@ -65,6 +65,12 @@ class Heater:
         gcode.register_mux_command("SET_HEATER_TEMPERATURE", "HEATER",
                                    self.name, self.cmd_SET_HEATER_TEMPERATURE,
                                    desc=self.cmd_SET_HEATER_TEMPERATURE_help)
+        gcode.register_mux_command("GET_HEATER_PARAMS", "HEATER",
+                                   self.name, self.cmd_GET_HEATER_PARAMS,
+                                   desc=self.cmd_GET_HEATER_PARAMS_help)
+        gcode.register_mux_command("SET_HEATER_PARAMS", "HEATER",
+                                   self.name, self.cmd_SET_HEATER_PARAMS,
+                                   desc=self.cmd_SET_HEATER_PARAMS_help)
     def set_pwm(self, read_time, value):
         if self.target_temp <= 0.:
             value = 0.
@@ -144,6 +150,12 @@ class Heater:
         temp = gcmd.get_float('TARGET', 0.)
         pheaters = self.printer.lookup_object('heaters')
         pheaters.set_temperature(self, temp)
+    cmd_GET_HEATER_PARAMS_help = "Gets params from heater"
+    def cmd_GET_HEATER_PARAMS(self, gcmd):
+        self.control.get_params(gcmd)
+    cmd_SET_HEATER_PARAMS_help = "Sets params for heater"
+    def cmd_SET_HEATER_PARAMS(self, gcmd):
+        self.control.set_params(gcmd)
 
 
 ######################################################################
@@ -167,6 +179,9 @@ class ControlBangBang:
             self.heater.set_pwm(read_time, 0.)
     def check_busy(self, eventtime, smoothed_temp, target_temp):
         return smoothed_temp < target_temp-self.max_delta
+    def get_params(self, gcmd):
+        gcmd.respond_info(
+            "PID parameters: max_delta=%.3f" % (self.max_delta,))
 
 
 ######################################################################
@@ -230,6 +245,17 @@ class ControlPID:
         return (abs(temp_diff) > PID_SETTLE_DELTA
                 or abs(self.prev_der) > PID_SETTLE_SLOPE)
 
+    def get_params(self, gcmd):
+        gcmd.respond_info(
+            "PID parameters: pid_Kp=%.3f pid_Ki=%.3f pid_Kd=%.3f"
+                % (self.Kp, self.Ki, self.Kd))
+
+    def set_params(self, gcmd):
+        self.Kp = gcmd.get_float('KP', self.Kp)
+        self.Ki = gcmd.get_float('KI', self.Ki)
+        self.Kd = gcmd.get_float('KD', self.Kd)
+        self.get_params(gcmd)
+
 
 ######################################################################
 # Velocity (PID) control algo
@@ -279,6 +305,17 @@ class ControlVelocityPID:
         temp_diff = target_temp - smoothed_temp
         return (abs(temp_diff) > PID_SETTLE_DELTA
                 or abs(self.d1) > PID_SETTLE_SLOPE)
+
+    def get_params(self, gcmd):
+        gcmd.respond_info(
+            "PID parameters: pid_Kp=%.3f pid_Ki=%.3f pid_Kd=%.3f"
+                % (self.Kp, self.Ki, self.Kd))
+
+    def set_params(self, gcmd):
+        self.Kp = gcmd.get_float('KP', self.Kp)
+        self.Ki = gcmd.get_float('KI', self.Ki)
+        self.Kd = gcmd.get_float('KD', self.Kd)
+        self.get_params(gcmd)
 
 
 ######################################################################
