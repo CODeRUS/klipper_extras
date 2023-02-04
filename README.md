@@ -1,6 +1,6 @@
 # Extras
 
-## Config
+## Usage
 
 Add to beginning of `printer.cfg`
 
@@ -8,6 +8,10 @@ Add to beginning of `printer.cfg`
 [heaters_extra]
 [pid_calibrate_extra]
 ```
+
+Copy `.py` files to `klipper/klippy/extras`
+
+Restart klipper service, RESTART command won't activate modules!
 
 ## Changes
 
