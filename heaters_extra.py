@@ -182,6 +182,9 @@ class ControlBangBang:
     def get_params(self, gcmd):
         gcmd.respond_info(
             "PID parameters: max_delta=%.3f" % (self.max_delta,))
+    def set_params(self, gcmd):
+        self.max_delta = gcmd.get_float('KP', self.max_delta)
+        self.get_params(gcmd)
 
 
 ######################################################################
