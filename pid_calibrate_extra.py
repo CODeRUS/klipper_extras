@@ -37,7 +37,7 @@ class PIDCalibrate:
         if calibrate.check_busy(0., 0., 0.):
             raise gcmd.error("pid_calibrate interrupted")
         # Log and report results
-        Kp, Ki, Kd = calibrate.calc_pid()
+        Kp, Ki, Kd = calibrate.calc_pid(gcmd)
         logging.info("Autotune: final: Kp=%f Ki=%f Kd=%f", Kp, Ki, Kd)
         gcmd.respond_info(
             "PID parameters: pid_Kp=%.3f pid_Ki=%.3f pid_Kd=%.3f\n"
@@ -239,7 +239,7 @@ class ControlAutoTune:
             high_time, high, max_power in samples]
         f.write('\n'.join(data))
         f.close()
-    def calc_pid(self):
+    def calc_pid(self, gcmd):
         temp_diff = 0.
         time_diff = 0.
         theta = 0.
@@ -263,12 +263,37 @@ class ControlAutoTune:
         logging.info("Ziegler-Nichols constants: Ku=%f Tu=%f", Ku, Tu)
         logging.info("Cohen-Coon constants: Km=%f Theta=%f Tau=%f", Km,
             theta, tau)
+        gcmd.respond_info(
+            "Ziegler-Nichols constants:\n"
+            "Ku=%.6f Tu=%.6f" % (Ku, Tu))
+        gcmd.respond_info(
+            "Cohen-Coon constants:\n"
+            "Km=%.6f Theta=%.6f Tau=%.6f" % (Km, theta, tau))
+
+        pb = heaters.PID_PARAM_BASE
+
+        gcmd.respond_info(
+            "Classic PID parameters:"
+            "Kp=%.3f Ki=%.3f Kd=%.3f\n"  % (0.6 * Ku * pb, 1.2 * Ku / Tu * pb, 0.075 * Ku * Tu * pb))
+
+        gcmd.respond_info("Extra PID variants:")
+        gcmd.respond_info(
+            "Pessen Integral Rule PID parameters:"
+            "Kp=%.3f Ki=%.3f Kd=%.3f\n"  % (0.7 * Ku * pb, 1.75 * Ku / Tu * pb, 0.105 * Ku * Tu * pb))
+        gcmd.respond_info(
+            "Some Overshoot PID parameters:"
+            "Kp=%.3f Ki=%.3f Kd=%.3f\n"  % (0.333 * Ku * pb, 0.666 * Ku / Tu * pb, 0.111 * Ku * Tu * pb))
+        gcmd.respond_info(
+            "No Overshoot PID parameters:"
+            "Kp=%.3f Ki=%.3f Kd=%.3f\n"  % (0.2 * Ku * pb, 0.4 * Ku / Tu * pb, 0.0666 * Ku * Tu * pb))
+
         # Use Ziegler-Nichols method to generate PID parameters
         Ti = 0.5 * Tu
         Td = 0.125 * Tu
-        Kp = 0.6 * Ku * heaters.PID_PARAM_BASE
+        Kp = 0.6 * Ku * pb
         Ki = Kp / Ti
         Kd = Kp * Td
+
         return Kp, Ki, Kd
 
 def load_config(config):
