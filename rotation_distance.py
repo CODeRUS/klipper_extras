@@ -48,13 +48,13 @@ class StepperRotationDistance:
                               % (requested,))
             return
         distance_current, spr = extruder.stepper.get_rotation_distance()
-        gcmd.respond_info("Extruder '%s' current step distance set to %0.6f"
+        gcmd.respond_info("Extruder '%s' current rotation distance set to %0.6f"
                           % (stepper_name, distance_current))
         distance_new = distance_current * extruded / requested
         toolhead = self.printer.lookup_object('toolhead')
         toolhead.flush_step_generation()
         extruder.stepper.set_rotation_distance(distance_new)
-        gcmd.respond_info("Extruder '%s' step distance set to %0.6f"
+        gcmd.respond_info("Extruder '%s' rotation distance set to %0.6f"
                           % (stepper_name, distance_new))
 
     cmd_ROTATION_DISTANCE_SAVE_help = "Save rotation distance to config"
@@ -80,7 +80,7 @@ class StepperRotationDistance:
         configfile = self.printer.lookup_object('configfile')
         configfile.set(object_name, 'rotation_distance', distance_current)
 
-        gcmd.respond_info("Extruder '%s' step distance set to %0.6f\n"
+        gcmd.respond_info("Extruder '%s' rotation distance set to %0.6f\n"
                           "The SAVE_CONFIG command will update the printer config file"
                           % (stepper_name, distance_current))
 
