@@ -37,11 +37,29 @@ Restart klipper service, RESTART command won't activate modules!
 
 `control: pid_v`
 
+Activates Velocity PID
+
+gcode commands:
+
+`SET_HEATER_PARAMS HEATER= KP= KI=  KD=`
+
+for pid controlled heater
+
+`SET_HEATER_PARAMS HEATER= MAX_DELTA=`
+
+for bang-bang heater
+
+`GET_HEATER_PARAMS HEATER=`
+
+Prints current heater params
+
 ### pid_calibrate_extra
 
 gcode command
 
 `PID_CALIBRATE_EXTRA`
+
+same options as default `PID_CALIBRATE`
 
 ### fan_extra
 
