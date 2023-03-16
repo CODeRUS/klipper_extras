@@ -18,42 +18,43 @@ class StepperRotationDistance:
     def cmd_ROTATION_DISTANCE_CALC(self, gcmd):
         stepper_name = gcmd.get('EXTRUDER', None)
         if stepper_name is None:
-            gcmd.respond_info('CALC_ROTATION_DISTANCE: Missing EXTRUDER value')
+            gcmd.respond_info('ROTATION_DISTANCE_CALC: Missing EXTRUDER value')
             return
         if stepper_name == 'extruder':
             extruder = self.printer.lookup_object('extruder')
+            stepper = extruder.extruder_stepper.stepper
         else:
             object_name = f'extruder_stepper {stepper_name}'
             if object_name in self.printer.objects:
                 extruder_stepper = self.printer.lookup_object(object_name)
-                extruder = extruder_stepper.extruder_stepper
-        if extruder is None:
-            gcmd.respond_info('CALC_ROTATION_DISTANCE: Invalid EXTRUDER value "%s"'
+                stepper = extruder_stepper.extruder_stepper.stepper
+        if stepper is None:
+            gcmd.respond_info('ROTATION_DISTANCE_CALC: Invalid EXTRUDER value "%s"'
                               % (stepper_name,))
             return
         extruded = gcmd.get_float('EXTRUDED', None)
         if extruded is None:
-            gcmd.respond_info('CALC_ROTATION_DISTANCE: Missing EXTRUDED value')
+            gcmd.respond_info('ROTATION_DISTANCE_CALC: Missing EXTRUDED value')
             return
         if extruded < 0:
-            gcmd.respond_info('CALC_ROTATION_DISTANCE: Invalid EXTRUDED value "%f"'
+            gcmd.respond_info('ROTATION_DISTANCE_CALC: Invalid EXTRUDED value "%f"'
                               % (extruded,))
             return
         requested = gcmd.get_float('REQUESTED', None)
         if requested is None:
-            gcmd.respond_info('CALC_ROTATION_DISTANCE: Missing REQUESTED value')
+            gcmd.respond_info('ROTATION_DISTANCE_CALC: Missing REQUESTED value')
             return
         if requested < 0:
-            gcmd.respond_info('CALC_ROTATION_DISTANCE: Invalid REQUESTED value "%f"'
+            gcmd.respond_info('ROTATION_DISTANCE_CALC: Invalid REQUESTED value "%f"'
                               % (requested,))
             return
-        distance_current, spr = extruder.stepper.get_rotation_distance()
+        distance_current, spr = stepper.get_rotation_distance()
         gcmd.respond_info("Extruder '%s' current rotation distance set to %0.6f"
                           % (stepper_name, distance_current))
         distance_new = distance_current * extruded / requested
         toolhead = self.printer.lookup_object('toolhead')
         toolhead.flush_step_generation()
-        extruder.stepper.set_rotation_distance(distance_new)
+        stepper.set_rotation_distance(distance_new)
         gcmd.respond_info("Extruder '%s' rotation distance set to %0.6f"
                           % (stepper_name, distance_new))
 
@@ -61,22 +62,22 @@ class StepperRotationDistance:
     def cmd_ROTATION_DISTANCE_SAVE(self, gcmd):
         stepper_name = gcmd.get('EXTRUDER', None)
         if stepper_name is None:
-            gcmd.respond_info('CALC_ROTATION_DISTANCE: Missing EXTRUDER value')
+            gcmd.respond_info('ROTATION_DISTANCE_SAVE: Missing EXTRUDER value')
             return
         if stepper_name == 'extruder':
-            object_name = 'extruder'
             extruder = self.printer.lookup_object('extruder')
+            stepper = extruder.extruder_stepper.stepper
         else:
             object_name = f'extruder_stepper {stepper_name}'
             if object_name in self.printer.objects:
                 extruder_stepper = self.printer.lookup_object(object_name)
-                extruder = extruder_stepper.extruder_stepper
-        if extruder is None:
-            gcmd.respond_info('CALC_ROTATION_DISTANCE: Invalid EXTRUDER value "%s"'
+                stepper = extruder_stepper.extruder_stepper.stepper
+        if stepper is None:
+            gcmd.respond_info('ROTATION_DISTANCE_SAVE: Invalid EXTRUDER value "%s"'
                               % (stepper_name,))
             return
 
-        distance_current, spr = extruder.stepper.get_rotation_distance()
+        distance_current, spr = stepper.get_rotation_distance()
         configfile = self.printer.lookup_object('configfile')
         configfile.set(object_name, 'rotation_distance', distance_current)
 
