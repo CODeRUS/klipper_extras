@@ -256,9 +256,9 @@ class ControlPID:
                    self.Kd * PID_PARAM_BASE))
 
     def set_params(self, gcmd):
-        self.Kp = gcmd.get_float('KP', self.Kp / PID_PARAM_BASE)
-        self.Ki = gcmd.get_float('KI', self.Ki / PID_PARAM_BASE)
-        self.Kd = gcmd.get_float('KD', self.Kd / PID_PARAM_BASE)
+        self.Kp = gcmd.get_float('KP', self.Kp * PID_PARAM_BASE) / PID_PARAM_BASE
+        self.Ki = gcmd.get_float('KI', self.Ki * PID_PARAM_BASE) / PID_PARAM_BASE
+        self.Kd = gcmd.get_float('KD', self.Kd * PID_PARAM_BASE) / PID_PARAM_BASE
         self.get_params(gcmd)
 
 
@@ -319,9 +319,9 @@ class ControlVelocityPID:
                    self.Kd * PID_PARAM_BASE))
 
     def set_params(self, gcmd):
-        self.Kp = gcmd.get_float('KP', self.Kp / PID_PARAM_BASE)
-        self.Ki = gcmd.get_float('KI', self.Ki / PID_PARAM_BASE)
-        self.Kd = gcmd.get_float('KD', self.Kd / PID_PARAM_BASE)
+        self.Kp = gcmd.get_float('KP', self.Kp * PID_PARAM_BASE) / PID_PARAM_BASE
+        self.Ki = gcmd.get_float('KI', self.Ki * PID_PARAM_BASE) / PID_PARAM_BASE
+        self.Kd = gcmd.get_float('KD', self.Kd * PID_PARAM_BASE) / PID_PARAM_BASE
         self.get_params(gcmd)
 
 
