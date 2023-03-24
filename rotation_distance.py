@@ -21,13 +21,12 @@ class StepperRotationDistance:
             gcmd.respond_info('ROTATION_DISTANCE_CALC: Missing EXTRUDER value')
             return
         if stepper_name == 'extruder':
-            extruder = self.printer.lookup_object('extruder')
-            stepper = extruder.extruder_stepper.stepper
+            object_name = 'extruder'
         else:
             object_name = f'extruder_stepper {stepper_name}'
-            if object_name in self.printer.objects:
-                extruder_stepper = self.printer.lookup_object(object_name)
-                stepper = extruder_stepper.extruder_stepper.stepper
+        if object_name in self.printer.objects:
+            extruder = self.printer.lookup_object(object_name)
+            stepper = extruder.extruder_stepper.stepper
         if stepper is None:
             gcmd.respond_info('ROTATION_DISTANCE_CALC: Invalid EXTRUDER value "%s"'
                               % (stepper_name,))
@@ -65,13 +64,12 @@ class StepperRotationDistance:
             gcmd.respond_info('ROTATION_DISTANCE_SAVE: Missing EXTRUDER value')
             return
         if stepper_name == 'extruder':
-            extruder = self.printer.lookup_object('extruder')
-            stepper = extruder.extruder_stepper.stepper
+            object_name = 'extruder'
         else:
             object_name = f'extruder_stepper {stepper_name}'
-            if object_name in self.printer.objects:
-                extruder_stepper = self.printer.lookup_object(object_name)
-                stepper = extruder_stepper.extruder_stepper.stepper
+        if object_name in self.printer.objects:
+            extruder = self.printer.lookup_object(object_name)
+            stepper = extruder.extruder_stepper.stepper
         if stepper is None:
             gcmd.respond_info('ROTATION_DISTANCE_SAVE: Invalid EXTRUDER value "%s"'
                               % (stepper_name,))
