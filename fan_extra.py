@@ -5,6 +5,8 @@
 # This file may be distributed under the terms of the GNU GPLv3 license.
 from . import pulse_counter
 
+MIN_PWM = 1. / 255.
+
 class Fan:
     def __init__(self, config, default_shutdown_speed=0.):
         self.printer = config.get_printer()
@@ -48,7 +50,7 @@ class Fan:
     def set_speed(self, print_time, init_value):
         value = init_value
         if value > 0:
-           value = value * (self.max_power - self.off_below) + self.off_below
+           value = (((value - MIN_PWM) * (self.max_power - self.off_below)) / (1 - MIN_PWM)) + self.off_below
         if value == self.last_fan_value:
             return
         print_time = max(self.last_fan_time + self.min_time, print_time)
