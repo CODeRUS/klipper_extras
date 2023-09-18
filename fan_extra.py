@@ -5,11 +5,10 @@
 # This file may be distributed under the terms of the GNU GPLv3 license.
 from . import pulse_counter
 
-FAN_MIN_TIME = 0.100
-
 class Fan:
     def __init__(self, config, default_shutdown_speed=0.):
         self.printer = config.get_printer()
+        self.printer.add_object('fan', self)
         self.last_fan_value = 0.
         self.last_fan_time = 0.
         # Read config
@@ -19,6 +18,7 @@ class Fan:
         self.off_below = config.getfloat('off_below', default=0.,
                                          minval=0., maxval=1.)
         cycle_time = config.getfloat('cycle_time', 0.010, above=0.)
+        self.min_time = config.getfloat('min_time', 0.1, minval=0.)
         hardware_pwm = config.getboolean('hardware_pwm', False)
         shutdown_speed = config.getfloat(
             'shutdown_speed', default_shutdown_speed, minval=0., maxval=1.)
@@ -45,12 +45,13 @@ class Fan:
 
     def get_mcu(self):
         return self.mcu_fan.get_mcu()
-    def set_speed(self, print_time, value):
+    def set_speed(self, print_time, init_value):
+        value = init_value
         if value > 0:
            value = value * (self.max_power - self.off_below) + self.off_below
         if value == self.last_fan_value:
             return
-        print_time = max(self.last_fan_time + FAN_MIN_TIME, print_time)
+        print_time = max(self.last_fan_time + self.min_time, print_time)
         if self.enable_pin:
             if value > 0 and self.last_fan_value == 0:
                 self.enable_pin.set_digital(print_time, 1)
@@ -63,7 +64,7 @@ class Fan:
             print_time += self.kick_start_time
         self.mcu_fan.set_pwm(print_time, value)
         self.last_fan_time = print_time
-        self.last_fan_value = value
+        self.last_fan_value = init_value
     def set_speed_from_command(self, value):
         toolhead = self.printer.lookup_object('toolhead')
         toolhead.register_lookahead_callback((lambda pt:
