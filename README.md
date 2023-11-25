@@ -31,6 +31,14 @@ Restart klipper service, RESTART command won't activate modules!
 
 ## Changes
 
+### heater_fan_extra
+
+Use `[heater_fan_extra extruder]` instead of `[heater_fan extruder]`
+
+gcode commands:
+
+`SET_HEATER_FAN_SPEED FAN=extruder SPEED=[0 - 1.0]`
+
 ### heaters_extra
 
 `heater` option:
