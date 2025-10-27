@@ -51,7 +51,8 @@ class Fan:
     def _apply_speed(self, print_time, value):
         if value < self.off_below:
             value = 0.
-        value = (((value - MIN_PWM) * (self.max_power - self.off_below)) / (1 - MIN_PWM)) + self.off_below
+        if value > 0:
+            value = (((value - MIN_PWM) * (self.max_power - self.off_below)) / (1 - MIN_PWM)) + self.off_below
         if value == self.last_fan_value:
             return "discard", 0.
         if self.enable_pin:
