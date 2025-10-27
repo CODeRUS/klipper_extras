@@ -10,6 +10,7 @@ MIN_PWM = 1. / 255.
 class Fan:
     def __init__(self, config, default_shutdown_speed=0.):
         self.printer = config.get_printer()
+        self.printer.add_object('fan', self)
         self.last_fan_value = self.last_req_value = 0.
         # Read config
         self.max_power = config.getfloat('max_power', 1., above=0., maxval=1.)
