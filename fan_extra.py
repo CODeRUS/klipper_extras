@@ -50,7 +50,8 @@ class Fan:
     def get_mcu(self):
         return self.mcu_fan.get_mcu()
     def _apply_speed(self, print_time, value):
-        value = (((value - MIN_PWM) * (self.max_power - self.off_below)) / (1 - MIN_PWM)) + self.off_below
+        if value > 0:
+            value = (((value - MIN_PWM) * (self.max_power - self.off_below)) / (1 - MIN_PWM)) + self.off_below
         if value == self.last_fan_value:
             return "discard", 0.
         if self.enable_pin:
